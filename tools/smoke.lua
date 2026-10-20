@@ -166,6 +166,7 @@ assert(FA.frames.arena1.attrs["shift-spell2"] == "Frost Nova", "shift binding")
 assert(FA.frames.arena1.attrs.type3 == "spell" and FA.frames.arena1.attrs.spell3 == "Counterspell", "middle binding")
 assert(LibStub("DRList-1.0").gameExpansion == "tbc", "DRList expansion")
 
+FA.db.profile.testCount = 3
 FA.TestMode:Enable()
 assert(FA.test and FA.frames.arena3:IsShown() and not FA.frames.arena4:IsShown(), "test frames shown")
 assert(FA.frames.arena1.portrait.model:IsShown() and not FA.frames.arena1.portrait.tex:IsShown(), "3D portrait in test mode")

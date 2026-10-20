@@ -53,4 +53,6 @@ Developer notes are in `DEVELOPMENT.md`.
 
 ## License
 
-MIT. Embedded libraries keep their own licenses: Ace3 and LibSharedMedia (BSD), DRList-1.0 (MIT).
+MIT. Embedded libraries keep their own licenses: Ace3 and LibSharedMedia (BSD), DRList-1.0 (MIT). The bundled Oswald font is SIL OFL.
+
+The CC countdown defaults to the FORCED SQUARE font, which Details and several SharedMedia packs provide. Without it the countdown uses Oswald.

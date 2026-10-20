@@ -12,8 +12,10 @@ local LSM = LibStub("LibSharedMedia-3.0", true)
 local BASE_SIZE = 120
 
 -- Ships the Minimalist bar texture (same file ShadowedUnitFrames uses) so it exists without SUF.
+local OSWALD = "Interface\\AddOns\\Sheepdog\\media\\fonts\\Oswald-Regular.ttf"
 if LSM then
 	LSM:Register("statusbar", "Minimalist", "Interface\\AddOns\\Sheepdog\\media\\Minimalist")
+	LSM:Register("font", "Oswald", OSWALD) -- bundled, SIL OFL
 end
 
 local function BarTexture()
@@ -24,13 +26,15 @@ local function BarTexture()
 	return FA.WHITE
 end
 
+-- A font that is not registered (for example FORCED SQUARE without Details installed) falls back
+-- to the bundled Oswald rather than to the game default, so the frames keep one look.
 local function FontPath(face)
 	local db = FA.db and FA.db.profile.font
 	face = face or (db and db.face)
 	if LSM and face then
-		return LSM:Fetch("font", face) or FA.FONT
+		return LSM:Fetch("font", face, true) or OSWALD
 	end
-	return FA.FONT
+	return OSWALD
 end
 
 -- size is in points; flags default to the profile's outline setting; face to the profile's font

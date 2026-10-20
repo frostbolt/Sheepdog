@@ -53,15 +53,15 @@ FA.defaults = {
 	profile = {
 		locked = true,
 		scale = 1,
-		size = 120,
+		size = 80,
 		growth = "right",      -- right, left, down, up
-		spacing = 12,
-		previewCount = 3,      -- frames the drag box covers
+		spacing = 10,
+		previewCount = 1,      -- frames the drag box covers
 		position = { point = "CENTER", x = 320, y = 40 },
 		frames = {
-			hpHeight = 0.18,
-			powerHeight = 0.18,
-			columnWidth = 0.2,
+			hpHeight = 0.2,
+			powerHeight = 0.2,
+			columnWidth = 0.25,
 			columnGap = 0.035,
 			classColorHealth = true,
 			showPercent = true,
@@ -69,16 +69,16 @@ FA.defaults = {
 			portrait = "3d",       -- 3d (live model), 2d (static face), class (class icon)
 			barTexture = "Minimalist",
 		},
-		testCount = 3,
+		testCount = 5,
 		font = {
-			face = "Friz Quadrata TT",
-			outline = "OUTLINE",       -- NONE, OUTLINE, THICKOUTLINE
+			face = "Oswald",           -- bundled (SIL OFL)
+			outline = "NONE",          -- NONE, OUTLINE, THICKOUTLINE
 			-- the big CC countdown has its own face, outline and color
-			bigFace = "Friz Quadrata TT",
-			bigOutline = "THICKOUTLINE",
+			bigFace = "FORCED SQUARE",  -- from Details or a SharedMedia pack; falls back to Oswald
+			bigOutline = "OUTLINE",
 			bigColor = { 1, 0.18, 0.18 },
 			-- point sizes at frame size 120; they scale with the frame size
-			sizes = { bar = 13, name = 9, castName = 9, castTime = 11, big = 26, ccName = 9, dr = 10, badge = 6, trinket = 9 },
+			sizes = { bar = 13, name = 9, castName = 9, castTime = 11, big = 40, ccName = 9, dr = 10, badge = 6, trinket = 9 },
 		},
 		cc = {
 			enabled = true,
@@ -89,7 +89,7 @@ FA.defaults = {
 		cast = {
 			enabled = true,
 			style = "bar",             -- bar, iconbar, reveal
-			barHeight = 0.14,          -- fraction of the frame size
+			barHeight = 0.2,           -- fraction of the frame size
 			castColor = { 0.95, 0.78, 0.3 },
 			channelColor = { 0.35, 0.65, 0.95 },
 			uninterruptibleColor = { 0.6, 0.6, 0.6 },
@@ -99,7 +99,7 @@ FA.defaults = {
 		},
 		dr = {
 			enabled = true,
-			slots = { "incapacitate", "stun", "root", "fear" },
+			slots = { "incapacitate", "root", "stun", "fear" },
 			showReset = true,
 			timerStartAuraEnd = false,
 		},

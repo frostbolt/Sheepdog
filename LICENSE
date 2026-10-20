@@ -22,4 +22,5 @@ SOFTWARE.
 
 Embedded libraries under Libs/ are distributed under their own licenses:
 Ace3 and LibSharedMedia-3.0 (BSD), CallbackHandler-1.0 and LibStub (public domain),
-DRList-1.0 (MIT).
+DRList-1.0 (MIT). The Oswald font (media/fonts) is under the SIL Open Font License,
+see media/fonts/OFL.txt.
