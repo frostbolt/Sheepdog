@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- First CurseForge release. Tuned defaults (frame size 80, Oswald font, FORCED SQUARE countdown), bundled Oswald font, drag box and DR badge fixes.
+
 ## 0.1.0
 
 First release for TBC Anniversary (interface 20506).
