@@ -8,6 +8,7 @@
 ## X-Category: PvP
 ## X-Website: https://github.com/frostbolt/Sheepdog
 ## X-License: MIT
+## X-Curse-Project-ID: 1756516
 ## IconTexture: Interface\AddOns\Sheepdog\media\icon
 
 embeds.xml
