@@ -78,7 +78,7 @@ FA.defaults = {
 			bigOutline = "THICKOUTLINE",
 			bigColor = { 1, 0.18, 0.18 },
 			-- point sizes at frame size 120; they scale with the frame size
-			sizes = { bar = 13, name = 9, castName = 9, castTime = 11, big = 26, ccName = 9, dr = 10, badge = 7, trinket = 9 },
+			sizes = { bar = 13, name = 9, castName = 9, castTime = 11, big = 26, ccName = 9, dr = 10, badge = 6, trinket = 9 },
 		},
 		cc = {
 			enabled = true,
@@ -159,11 +159,6 @@ function FA:ADDON_LOADED(_, name)
 end
 
 function FA:OnInitialize()
-	-- settings saved under the old name (FrostArena) carry over once
-	if _G.FrostArenaDB and not _G.SheepdogDB then
-		_G.SheepdogDB = _G.FrostArenaDB
-	end
-	_G.FrostArenaDB = nil
 	self.db = LibStub("AceDB-3.0"):New("SheepdogDB", self.defaults, true)
 	self.db.RegisterCallback(self, "OnProfileChanged", "Refresh")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Refresh")

@@ -3,9 +3,12 @@
 ## Notes: Enemy arena frames built for a mage: casts, CC countdowns, diminishing returns and trinkets.
 ## Author: frostbolt
 ## Version: 0.1.0
-## SavedVariables: SheepdogDB, FrostArenaDB
+## SavedVariables: SheepdogDB
 ## OptionalDeps: OmniCC
 ## X-Category: PvP
+## X-Website: https://github.com/frostbolt/Sheepdog
+## X-License: MIT
+## IconTexture: Interface\AddOns\Sheepdog\media\icon
 
 embeds.xml
 Core.lua

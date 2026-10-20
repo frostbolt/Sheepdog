@@ -101,10 +101,10 @@ function FA.CreateSlot(parent)
 	overlay:SetAllPoints()
 	overlay:SetFrameLevel(s.cd:GetFrameLevel() + 2)
 	s.text = overlay:CreateFontString(nil, "OVERLAY")
-	s.text:SetPoint("CENTER")
+	s.text:SetPoint("CENTER", -1, 1) -- leaves the bottom-right corner to the badge
 	SetFont(s.text, 10)
 	s.badge = overlay:CreateFontString(nil, "OVERLAY")
-	s.badge:SetPoint("BOTTOMRIGHT", -1, 0)
+	s.badge:SetPoint("BOTTOMRIGHT", -1, 1)
 	SetFont(s.badge, 8)
 	-- keep the icon's proportions inside a slot that is not exactly square
 	function s:SetSlotSize(w, h)
@@ -124,7 +124,7 @@ function Frames:Create()
 	self.anchor = anchor
 
 	local ov = CreateFrame("Frame", nil, anchor)
-	ov:SetAllPoints()
+	ov:SetAllPoints() -- re-anchored to the frames in Layout
 	ov:SetFrameStrata("HIGH")
 	ov:EnableMouse(true)
 	ov:RegisterForDrag("LeftButton")
@@ -258,6 +258,21 @@ function Frames:Layout()
 		f.column:SetSize(colW, S)
 
 		FA:Call("OnLayout", f, S)
+	end
+
+	-- the drag box spans the first n frames, whatever direction they grow in
+	local first, last = FA.frameList[1], FA.frameList[math.min(n, #FA.frameList)]
+	local ov = self.overlay
+	ov:ClearAllPoints()
+	if db.growth == "left" then
+		ov:SetPoint("TOPRIGHT", first, "TOPRIGHT", 4, 4)
+		ov:SetPoint("BOTTOMLEFT", last, "BOTTOMLEFT", -4, -4)
+	elseif db.growth == "up" then
+		ov:SetPoint("BOTTOMLEFT", first, "BOTTOMLEFT", -4, -4)
+		ov:SetPoint("TOPRIGHT", last, "TOPRIGHT", 4, 4)
+	else -- right, down
+		ov:SetPoint("TOPLEFT", first, "TOPLEFT", -4, 4)
+		ov:SetPoint("BOTTOMRIGHT", last, "BOTTOMRIGHT", 4, -4)
 	end
 end
 
