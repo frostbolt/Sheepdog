@@ -18,7 +18,7 @@ end
 --   immune    immunities, stealth, drinking (on by default)
 --   defensive big defensives (off by default)
 -- Priorities follow the GladiusEx BCC table so the ordering is familiar.
--- At or above cc.hardPriority (7) an aura beats an active cast; below it a cast shows first.
+-- Priority 9+ is breakable CC, 8 stuns, below that roots and silences; see Bucket() in CastCC.lua.
 local P = {}
 local function add(kind, prio, ...)
 	for i = 1, select("#", ...) do P[(select(i, ...))] = { prio = prio, kind = kind } end

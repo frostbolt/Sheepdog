@@ -62,6 +62,7 @@ function Trinket:Use(f, spellId)
 	if f.trinket and now - f.trinket.start < 0.5 then return end -- unit event and combat log both fire
 	f.trinket = { start = now, duration = d.cd, spellId = spellId }
 	self:UpdateFrame(f)
+	FA:Call("OnTrinketUsed", f, spellId)
 	if FA.db.profile.trinket.flash then
 		f.flash.ag:Stop()
 		f.flash.ag:Play()

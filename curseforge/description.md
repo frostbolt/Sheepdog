@@ -19,7 +19,7 @@ Left click targets, right click Polymorph, middle click Counterspell, Shift + ri
 
 ## Settings
 
-`/sheep` opens the panel. It starts on a Welcome tab with an annotated picture of the frame. Layout (scale, growth direction, spacing, lock and drag), bar texture, portrait style, cast style and colors, DR categories, trinket flash, fonts for every text, and profiles.
+`/sheep` opens the panel. Six tabs: Setup (annotated frame picture, test mode, unlock and drag, size, growth, spacing), Look (bars, portrait, fonts), Tracking (casts, what takes over the portrait, DR slots, trinket), Click casting, Announce (post your interrupts, CC landing with DR state, and enemy trinkets to group chat), and Profiles. Rarely used knobs sit under Advanced at the bottom of each tab.
 
 `/sheep test 5` shows five fake opponents casting, getting CC'd and trinketing on a loop, so you can set everything up outside an arena.
 

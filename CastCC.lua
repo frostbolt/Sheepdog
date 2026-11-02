@@ -86,8 +86,8 @@ function CastCC:ApplyStyle(f, S)
 	local db = FA.db.profile
 	local c = f.center
 	local style = db.cast.style or "bar"
-	local ph = S * (1 - db.frames.hpHeight - db.frames.powerHeight)
-	local barH = math.max(4, math.floor(S * (db.cast.barHeight or 0.14) + 0.5))
+	local ph = S * (1 - 2 * db.frames.barHeight)
+	local barH = math.max(4, math.floor(S * db.frames.barHeight + 0.5))
 	c.style = style
 
 	c.icon:ClearAllPoints()
@@ -145,11 +145,15 @@ function CastCC:OnLayout(f, S)
 	if f.mode then self:Decide(f) end
 end
 
-local function Allowed(entry, db)
-	if entry.kind == "cc" then return true end
-	if entry.kind == "immune" then return db.showImmunities end
-	if entry.kind == "defensive" then return db.showDefensives end
-	return false
+-- Aura table entries fall into five buckets the user can switch on and off. Breakable CC, stuns
+-- and immunities also beat an active cast; roots, silences and defensives show only when idle.
+local HARD = { breakable = true, stuns = true, immunities = true }
+local function Bucket(entry)
+	if entry.kind == "immune" then return "immunities" end
+	if entry.kind == "defensive" then return "defensives" end
+	if entry.prio >= 9 then return "breakable" end
+	if entry.prio >= 8 then return "stuns" end
+	return "roots"
 end
 
 function CastCC:ReadCast(f)
@@ -168,11 +172,12 @@ local function ScanFilter(f, filter, db, best)
 		if not name then break end
 		local e = (spellId and FA.AURA_PRIO[spellId]) or FA.AURA_PRIO_BY_NAME[name]
 		local expired = expiration and expiration > 0 and expiration <= GetTime()
-		if e and not expired and Allowed(e, db) then
+		local bucket = e and Bucket(e)
+		if e and not expired and db.show[bucket] then
 			if not best or e.prio > best.prio or (e.prio == best.prio and (expiration or 0) > (best.expiration or 0)) then
 				best = best or {}
-				best.name, best.icon, best.duration, best.expiration, best.prio, best.kind =
-					name, icon, duration or 0, expiration or 0, e.prio, e.kind
+				best.name, best.icon, best.duration, best.expiration, best.prio, best.hard =
+					name, icon, duration or 0, expiration or 0, e.prio, HARD[bucket] or false
 			end
 		end
 	end
@@ -181,7 +186,6 @@ end
 
 function CastCC:ReadAuras(f)
 	local db = FA.db.profile.cc
-	if not db.enabled then f.cc = nil return end
 	local best = ScanFilter(f, "HARMFUL", db, nil)
 	best = ScanFilter(f, "HELPFUL", db, best)
 	f.cc = best
@@ -201,9 +205,8 @@ function CastCC:Decide(f)
 	local cc = f.cc
 	local cast = f.cast
 	if not cast and f.castFlash and f.castFlash.until_ > GetTime() then cast = f.castFlash end
-	local hard = FA.db.profile.cc.hardPriority or 7
 	local mode
-	if cc and cc.prio >= hard then
+	if cc and cc.hard then
 		mode = "cc"
 	elseif cast then
 		mode = "cast"

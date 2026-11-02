@@ -48,8 +48,8 @@ FA.SetFont = SetFont
 
 -- Point size for a named text at frame size S (sizes are defined at frame size 120).
 function FA.FontSize(key, S)
-	local sizes = FA.db.profile.font.sizes
-	return (sizes[key] or 10) * S / BASE_SIZE
+	local font = FA.db.profile.font
+	return (font.sizes[key] or 10) * (font.scale or 1) * S / BASE_SIZE
 end
 
 -- Four thin textures around a frame; cheaper and older-client-safe compared to backdrops.
@@ -216,10 +216,12 @@ function Frames:Layout()
 	local S = db.size
 	local colW, colGap = S * db.frames.columnWidth, S * db.frames.columnGap
 	local W = S + colGap + colW
-	local hpH, pwH = S * db.frames.hpHeight, S * db.frames.powerHeight
+	local hpH, pwH = S * db.frames.barHeight, S * db.frames.barHeight
 	local g = FA.GROWTH[db.growth] or FA.GROWTH.right
 	local spacing = db.spacing
-	local n = math.max(1, db.previewCount or 3)
+	local n = db.previewCount or 0
+	if n < 1 then n = db.testCount or 3 end
+	n = math.max(1, math.min(FA.MAX_ARENA, n))
 
 	self.anchor:SetScale(db.scale)
 	if g.x ~= 0 then
@@ -310,10 +312,13 @@ function Frames:UpdateHealth(f)
 	max = (max and max > 0) and max or 1
 	hp = hp or 0
 	f.hp:SetValue(hp / max)
-	if FA.db.profile.frames.showPercent then
-		f.hp.text:SetFormattedText("%d%%", math.floor(hp / max * 100 + 0.5))
-	else
+	local mode = FA.db.profile.frames.healthText
+	if mode == "none" then
+		f.hp.text:SetText("")
+	elseif mode == "absolute" then
 		f.hp.text:SetText(AbbreviateLargeNumbers and AbbreviateLargeNumbers(hp) or hp)
+	else
+		f.hp.text:SetFormattedText("%d%%", math.floor(hp / max * 100 + 0.5))
 	end
 end
 

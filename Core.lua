@@ -56,15 +56,14 @@ FA.defaults = {
 		size = 80,
 		growth = "right",      -- right, left, down, up
 		spacing = 10,
-		previewCount = 1,      -- frames the drag box covers
+		previewCount = 0,      -- frames the drag box covers; 0 = as many as test opponents
 		position = { point = "CENTER", x = 320, y = 40 },
 		frames = {
-			hpHeight = 0.2,
-			powerHeight = 0.2,
+			barHeight = 0.2,       -- health, power and cast bar, as a fraction of the frame size
 			columnWidth = 0.25,
 			columnGap = 0.035,
 			classColorHealth = true,
-			showPercent = true,
+			healthText = "percent", -- percent, absolute, none
 			showName = true,
 			portrait = "3d",       -- 3d (live model), 2d (static face), class (class icon)
 			barTexture = "Minimalist",
@@ -77,19 +76,17 @@ FA.defaults = {
 			bigFace = "FORCED SQUARE",  -- from Details or a SharedMedia pack; falls back to Oswald
 			bigOutline = "OUTLINE",
 			bigColor = { 1, 0.18, 0.18 },
+			scale = 1,                 -- multiplier for every text except the CC countdown
 			-- point sizes at frame size 120; they scale with the frame size
 			sizes = { bar = 13, name = 9, castName = 9, castTime = 11, big = 40, ccName = 9, dr = 10, badge = 6, trinket = 9 },
 		},
 		cc = {
-			enabled = true,
-			showImmunities = true,
-			showDefensives = false,
-			hardPriority = 7,   -- auras at or above this priority beat an active cast
+			-- which auras take over the portrait; breakable CC, stuns and immunities also beat an active cast
+			show = { breakable = true, stuns = true, roots = true, immunities = true, defensives = false },
 		},
 		cast = {
 			enabled = true,
 			style = "bar",             -- bar, iconbar, reveal
-			barHeight = 0.2,           -- fraction of the frame size
 			castColor = { 0.95, 0.78, 0.3 },
 			channelColor = { 0.35, 0.65, 0.95 },
 			uninterruptibleColor = { 0.6, 0.6, 0.6 },
@@ -118,6 +115,15 @@ FA.defaults = {
 			},
 		},
 		hideBlizzard = true,
+		showInBattlegrounds = false,
+		announce = {
+			enabled = true,
+			channel = "group",     -- group (party or raid), say, self
+			onlyInArena = true,
+			interrupts = true,
+			cc = true,
+			trinkets = true,
+		},
 	},
 }
 
@@ -160,12 +166,31 @@ end
 
 function FA:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("SheepdogDB", self.defaults, true)
+	self:MigrateProfile()
 	self.db.RegisterCallback(self, "OnProfileChanged", "Refresh")
 	self.db.RegisterCallback(self, "OnProfileCopied", "Refresh")
 	self.db.RegisterCallback(self, "OnProfileReset", "Refresh")
 	self:RegisterChatCommand("sheep", "ChatCommand")
 	self:RegisterChatCommand("sheepdog", "ChatCommand")
 	if self.SetupOptions then self:SetupOptions() end
+end
+
+-- Settings saved under keys from 0.1.1 move to the simpler 0.1.2 layout once. Keys that no longer
+-- have a default only exist in the saved table when the user changed them, so they are easy to spot.
+function FA:MigrateProfile()
+	local p = self.db.profile
+	local f, cc, cast = p.frames, p.cc, p.cast
+	if f.hpHeight then f.barHeight = f.hpHeight end
+	f.hpHeight, f.powerHeight = nil, nil
+	if f.showPercent == false then f.healthText = "absolute" end
+	f.showPercent = nil
+	if cc.showImmunities == false then cc.show.immunities = false end
+	if cc.showDefensives then cc.show.defensives = true end
+	if cc.enabled == false then
+		for k in pairs(cc.show) do cc.show[k] = false end
+	end
+	cc.showImmunities, cc.showDefensives, cc.hardPriority, cc.enabled, cc.bigTextScale = nil, nil, nil, nil, nil
+	cast.barHeight = nil
 end
 
 function FA:OnEnable()
@@ -197,8 +222,34 @@ function FA:InArena()
 	return instanceType == "arena"
 end
 
+function FA:InBattleground()
+	local _, instanceType = IsInInstance()
+	return instanceType == "pvp"
+end
+
+-- Battlegrounds expose flag carriers as arena1/arena2, so a plain unit watch would pop frames
+-- there. The watch is only armed where the frames are wanted.
+function FA:UpdateUnitWatch()
+	if self.test then return end
+	if InCombatLockdown() then
+		self.pendingWatch = true
+		return
+	end
+	self.pendingWatch = nil
+	local show = self:InArena() or (self.db.profile.showInBattlegrounds and self:InBattleground())
+	for _, f in ipairs(self.frameList) do
+		if show then
+			RegisterUnitWatch(f)
+		else
+			UnregisterUnitWatch(f)
+			f:Hide()
+		end
+	end
+end
+
 function FA:ZoneChanged()
 	if self.test then return end
+	self:UpdateUnitWatch()
 	if self:InArena() then
 		if not self.inArena then
 			self.inArena = true
@@ -273,6 +324,7 @@ end
 function FA:PLAYER_REGEN_ENABLED()
 	if self.pendingRefresh then self:Refresh() end
 	if self.pendingHideBlizzard then self:HideBlizzardFrames() end
+	if self.pendingWatch then self:UpdateUnitWatch() end
 	if self.ClickCast then self.ClickCast:ApplyPending() end
 	if self.TestMode then self.TestMode:ApplyPending() end
 end

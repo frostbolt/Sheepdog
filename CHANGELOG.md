@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Settings panel reorganized into six tabs (Setup, Look, Tracking, Click casting, Announce, Profiles) with rare knobs under Advanced. One Size slider, one bar height, one text size multiplier, and a single list of what takes over the portrait. Saved settings migrate automatically.
+- Frames are arena-only by default. Battlegrounds expose flag carriers as arena units, which made the frames pop up there; a toggle under Setup › Advanced brings them back on purpose.
+- Announce tab: post your interrupts, your CC landing with its real duration and DR state, and enemy trinket uses to group chat (or say, or just yourself).
+
 ## 0.1.1
 
 - First CurseForge release. Tuned defaults (frame size 80, Oswald font, FORCED SQUARE countdown), bundled Oswald font, drag box and DR badge fixes.

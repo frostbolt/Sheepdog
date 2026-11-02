@@ -105,9 +105,9 @@ function TM:Disable()
 	FA.DR:Wipe()
 	for _, f in ipairs(FA.frameList) do
 		FA:ResetUnit(f.unit)
-		RegisterUnitWatch(f)
-		if not UnitExists(f.unit) then f:Hide() end
+		f:Hide()
 	end
+	FA:UpdateUnitWatch()
 	FA:Print("Test mode off.")
 end
 

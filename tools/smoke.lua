@@ -60,7 +60,11 @@ _G.COMBATLOG_OBJECT_TYPE_PLAYER, _G.COMBATLOG_OBJECT_REACTION_HOSTILE = 0x400, 0
 _G.InCombatLockdown = function() return false end
 _G.IsInInstance = function() return false, "none" end
 _G.UnitExists = function() return false end
-_G.UnitGUID = function() return nil end
+_G.UnitGUID = function(unit) return unit == "player" and "Player-1-ME" or nil end
+_G.IsInGroup = function() return true end
+_G.IsInRaid = function() return false end
+local sent = {}
+_G.SendChatMessage = function(msg, channel) table.insert(sent, channel .. ": " .. msg) end
 _G.UnitClass = function() return nil end
 _G.UnitName = function() return nil end
 _G.UnitIsVisible = function() return false end
@@ -71,7 +75,8 @@ _G.UnitPowerMax = function() return 0 end
 _G.UnitPowerType = function() return 0, "MANA" end
 _G.UnitCastingInfo = function() return nil end
 _G.UnitChannelInfo = function() return nil end
-_G.UnitAura = function() return nil end
+local auraStub = function() return nil end
+_G.UnitAura = function(...) return auraStub(...) end
 _G.SetPortraitTexture = function() end
 _G.RegisterUnitWatch = function() end
 _G.UnregisterUnitWatch = function() end
@@ -86,6 +91,7 @@ _G.strmatch, _G.strfind, _G.strlower, _G.strupper, _G.format, _G.gsub, _G.strlen
 _G.tinsert, _G.tremove, _G.floor, _G.ceil, _G.max, _G.min = table.insert, table.remove, math.floor, math.ceil, math.max, math.min
 local tickers = {}
 _G.C_Timer = { NewTicker = function(interval, fn) local t = { interval = interval, fn = fn, due = now + interval } tickers[t] = true t.Cancel = function() tickers[t] = nil end return t end }
+_G.C_Timer.After = function(delay, fn) local t = {} t.due = now + delay t.interval = math.huge t.fn = function() tickers[t] = nil fn() end tickers[t] = true end
 local cleu
 _G.CombatLogGetCurrentEventInfo = function() return unpack(cleu) end
 _G.LoadAddOn = function() return false end
@@ -166,6 +172,13 @@ assert(FA.frames.arena1.attrs["shift-spell2"] == "Frost Nova", "shift binding")
 assert(FA.frames.arena1.attrs.type3 == "spell" and FA.frames.arena1.attrs.spell3 == "Counterspell", "middle binding")
 assert(LibStub("DRList-1.0").gameExpansion == "tbc", "DRList expansion")
 
+-- 0.1.1 profile keys migrate into the simpler layout
+FA.db.profile.frames.hpHeight = 0.25; FA.db.profile.frames.showPercent = false; FA.db.profile.cc.showDefensives = true
+FA:MigrateProfile()
+assert(FA.db.profile.frames.barHeight == 0.25 and FA.db.profile.frames.healthText == "absolute" and FA.db.profile.cc.show.defensives == true, "profile migration")
+assert(FA.db.profile.frames.hpHeight == nil and FA.db.profile.cc.showDefensives == nil, "legacy keys cleared")
+FA.db.profile.frames.barHeight = 0.2; FA.db.profile.frames.healthText = "percent"; FA.db.profile.cc.show.defensives = false
+FA:Refresh()
 FA.db.profile.testCount = 3
 FA.TestMode:Enable()
 assert(FA.test and FA.frames.arena3:IsShown() and not FA.frames.arena4:IsShown(), "test frames shown")
@@ -205,6 +218,32 @@ assert(FA.DR:Level("Player-1-ABC", "incapacitate") == 1, "CLEU DR apply")
 cleu = { now, "SPELL_CAST_SUCCESS", false, "Player-1-ABC", "Them", 0x548, 0, "", nil, 0, 0, 42292, "PvP Trinket", 1 }
 fire("COMBAT_LOG_EVENT_UNFILTERED")
 assert(FA.frames.arena1.trinket, "CLEU trinket")
+-- announcements go to the group once we are "in an arena"
+_G.IsInInstance = function() return true, "arena" end
+cleu = { now, "SPELL_INTERRUPT", false, "Player-1-ME", "Me", 0x511, 0, "Player-1-ABC", "Them-Realm", 0x548, 0, 2139, "Counterspell", 64, 2060, "Greater Heal", 2 }
+fire("COMBAT_LOG_EVENT_UNFILTERED")
+cleu = { now, "SPELL_AURA_APPLIED", false, "Player-1-ME", "Me", 0x511, 0, "Player-1-ABC", "Them-Realm", 0x548, 0, 118, "Polymorph", 64, "DEBUFF" }
+-- the aura is not on the unit yet at CLEU time; it shows up a tick later with its diminished duration
+fire("COMBAT_LOG_EVENT_UNFILTERED")
+assert(sent[1] == "PARTY: Kicked Them (Greater Heal)", "interrupt announce, got " .. tostring(sent[1]))
+assert(sent[2] == nil, "cc announce waits for the aura")
+auraStub = function(unit, i, filter)
+	if unit == "arena1" and i == 1 and filter == "HARMFUL" then return "Polymorph", 136071, 1, "Magic", 5, now + 5, "player", false, false, 118 end
+end
+advance(0.2)
+assert(sent[2] == "PARTY: Polymorph on Them 5s (1/2)", "cc announce with duration and DR, got " .. tostring(sent[2]))
+auraStub = function() return nil end
+-- a third application: aura visible right away, quarter DR
+cleu = { now, "SPELL_AURA_APPLIED", false, "Player-1-ME", "Me", 0x511, 0, "Player-1-ABC", "Them-Realm", 0x548, 0, 118, "Polymorph", 64, "DEBUFF" }
+auraStub = function(unit, i, filter)
+	if unit == "arena1" and i == 1 and filter == "HARMFUL" then return "Polymorph", 136071, 1, "Magic", 2.5, now + 2.5, "player", false, false, 118 end
+end
+fire("COMBAT_LOG_EVENT_UNFILTERED")
+assert(sent[3] == "PARTY: Polymorph on Them 2.5s (1/4)", "cc announce immediate, got " .. tostring(sent[3]))
+auraStub = function() return nil end
+_G.IsInInstance = function() return false, "none" end
+FA:ZoneChanged()
+assert(not FA.frames.arena1:IsShown(), "frames hidden outside arena")
 
 -- options table: every get runs, every set round-trips its own value
 local function walk(t, path)

@@ -31,16 +31,13 @@ From CurseForge, or copy the `Sheepdog` folder into `World of Warcraft/_annivers
 
 ## Settings
 
-The panel opens on a Welcome tab with an annotated picture of the frame. The other tabs:
+`/sheep` opens the panel. Six tabs; the rarely used knobs sit under "Advanced" at the bottom of each.
 
-- **Layout**: lock, test mode, scale, frame size, growth direction, spacing.
-- **Bars & portrait**: class color, percent or absolute health, name, bar texture, portrait style (3D, 2D, class icon), bar heights, column width.
-- **Cast & CC**: cast style, bar height and colors, the interrupt flash, which auras take over the portrait, and the priority at which an aura beats a cast.
-- **Diminishing returns**: which categories get a slot and in what order, reset countdown, when the reset window starts.
-- **Trinket**: tracking, flash, flash color and duration.
-- **Click casting**: any number of bindings mapping a modifier plus mouse button to target, focus, a spell or a macro (`%unit%` in a macro becomes the clicked unit).
-- **Fonts**: font face, outline and size for every text; the CC countdown has its own.
-- **Misc**: hide the default Blizzard arena frames.
+- **Setup**: the annotated frame picture, test mode and opponent count, unlock and drag, reset position, size, growth direction, spacing. Advanced: hide Blizzard arena frames, show in battlegrounds, drag box width.
+- **Look**: bar texture and height, health text, class color, portrait style, name, icon column width, font and outline, one text size multiplier, and the CC countdown's own font, size and color. Advanced: per-text sizes, countdown outline.
+- **Tracking**: casts (style, colors, interrupt flash), which auras take over the portrait (breakable CC, stuns, roots and silences, immunities, big defensives), diminishing-returns slots and their order, trinket flash. Advanced: DR window start, tracking on/off switches.
+- **Click casting**: one row per binding: modifier, mouse button, action, spell or macro (`%unit%` in a macro becomes the clicked unit).
+- **Announce**: post your interrupts, your CC landing (with its real duration and DR state) and enemy trinket uses to group chat, say, or only your own chat frame. Arena-only by default. Lines look like `Kicked Thrall (Greater Heal)`, `Polymorph on Thrall 5s (1/2)`, `Thrall used trinket`.
 - **Profiles**: standard profiles.
 
 ## Notes

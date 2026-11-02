@@ -2,7 +2,7 @@
 ## Title: Sheepdog Arena Frames
 ## Notes: Enemy arena frames built for a mage: casts, CC countdowns, diminishing returns and trinkets.
 ## Author: frostbolt
-## Version: 0.1.1
+## Version: 0.1.2
 ## SavedVariables: SheepdogDB
 ## OptionalDeps: OmniCC
 ## X-Category: PvP
@@ -19,6 +19,7 @@ Frames.lua
 CastCC.lua
 DR.lua
 Trinket.lua
+Announce.lua
 ClickCast.lua
 TestMode.lua
 Options.lua
